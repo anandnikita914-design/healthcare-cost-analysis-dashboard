@@ -1,4 +1,3 @@
-
 import pandas as pd
 import streamlit as st
 
@@ -52,14 +51,43 @@ else:
     filtered_df = df[df["Department"] == department]
 
 # -----------------------------
-# Key Metric
+# Key Metrics
 # -----------------------------
 total_cost = filtered_df["Healthcare_Cost"].sum()
+average_cost = filtered_df["Healthcare_Cost"].mean()
 
-st.metric(
-    "Total Healthcare Cost",
-    f"₹{total_cost:,.0f}"
-)
+col1, col2 = st.columns(2)
+
+with col1:
+    st.metric(
+        "Total Healthcare Cost",
+        f"₹{total_cost:,.0f}"
+    )
+
+with col2:
+    st.metric(
+        "Average Treatment Cost",
+        f"₹{average_cost:,.0f}"
+    )
+
+# -----------------------------
+# High Cost Alert
+# -----------------------------
+st.subheader("🚨 High Cost Alert")
+
+high_cost = filtered_df[filtered_df["Healthcare_Cost"] >= 50000]
+
+if len(high_cost) > 0:
+    st.warning(
+        f"{len(high_cost)} high-cost treatment(s) found. "
+        "These treatments may require closer cost monitoring."
+    )
+    st.dataframe(
+        high_cost[["Department", "Treatment", "Healthcare_Cost"]],
+        use_container_width=True
+    )
+else:
+    st.success("No high-cost treatment found for the selected department.")
 
 # -----------------------------
 # Data Table
